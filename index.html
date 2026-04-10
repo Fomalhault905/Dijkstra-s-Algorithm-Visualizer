@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijkstra's Algorithm Visualization</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div id="app">
+    <div class="app">
+
+        <header class="app-header">
+            <h1>Dijkstra's Algorithm Visualizer</h1>
+            <p>Interactive shortest path finding visualization</p>
+        </header>
+
+        <main class="main-container">
+            <div class="grid-layout">
+
+                <!-- GRAPH AREA -->
+                <div class="canvas-area">
+                    <svg id="graph-svg"></svg>
+
+                    <div class="selection-info">
+                        <span id="top-source">Click source node</span>
+                        <span id="top-dest">Click destination node</span>
+                    </div>
+                </div>
+
+                <!-- CONTROL PANEL -->
+                <div class="control-panel">
+
+                    <!-- Generate Graph -->
+                    <div class="card">
+                        <h3>Generate Graph</h3>
+
+                        <div class="form-group">
+                            <label>Number of Nodes:</label>
+                            <input type="number" id="node-count" min="3" max="10" value="6">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Edge Weight Type:</label>
+                            <select id="weight-type">
+                                <option value="random">Random (1-9)</option>
+                                <option value="custom">Manual Input</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" id="generate-btn">Generate Graph</button>
+                        <button class="btn btn-secondary" id="manual-nodes-edges-btn">Manual Mode</button>
+                    </div>
+
+                    <!-- Selection -->
+                    <div class="card">
+                        <h3>Selection</h3>
+
+                        <div class="selection-item">
+                            <span>Source:</span>
+                            <span id="selected-source">None</span>
+                        </div>
+
+                        <div class="selection-item">
+                            <span>Destination:</span>
+                            <span id="selected-dest">None</span>
+                        </div>
+
+                        <button class="btn btn-secondary" id="clear-selection-btn">Clear</button>
+                    </div>
+
+                    <!-- Simulation -->
+                    <div class="card">
+                        <h3>Run</h3>
+                        <button class="btn btn-primary" id="run-simulation-btn">
+                            Find Shortest Path
+                        </button>
+                    </div>
+
+                    <!-- Result -->
+                    <div class="card" id="results-card" style="display:none;">
+                        <h3>Result</h3>
+
+                        <div>
+                            Path: <span id="path-display">-</span>
+                        </div>
+
+                        <div>
+                            Distance: <span id="distance-display">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Routing Table -->
+                    <div class="card">
+                        <h3>Routing Table</h3>
+
+                        <table id="routing-table">
+                            <thead>
+                                <tr>
+                                    <th>Destination</th>
+                                    <th>Next Hop</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- WEIGHT MODAL -->
+<div id="weight-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Edit Edge Weights</h2>
+        </div>
+
+        <div class="modal-body">
+            <div id="modal-weight-inputs"></div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-primary" id="modal-confirm-btn">Confirm</button>
+            <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- MANUAL MODE SIDE PANEL -->
+<div id="manual-panel" class="manual-panel" style="display:none;">
+
+    <div class="manual-panel-header">
+        <span>✏️ Manual Mode</span>
+        <button class="modal-close" id="manual-close-btn">×</button>
+    </div>
+
+    <div class="manual-panel-body">
+
+       <!-- ── ADD NODE ── -->
+<div class="mp-section">
+    <div class="mp-section-title">➕ Add Node</div>
+
+    <button class="btn btn-primary mp-btn" id="click-add-node-btn">🖱️ Click Canvas to Place Node</button>
+    <button class="btn btn-active mp-btn" id="stop-click-node-btn" style="display:none;">⏹️ Stop Placing Nodes</button>
+    <div id="node-click-status" class="mp-status"></div>
+</div>
+
+<div class="mp-hr"></div>
+
+<!-- ── ADD EDGE ── -->
+<div class="mp-section">
+    <div class="mp-section-title">🔗 Add Edge</div>
+
+    <button class="btn btn-primary mp-btn" id="click-add-edge-btn">🖱️ Click Two Nodes to Connect</button>
+    <button class="btn btn-active mp-btn" id="stop-click-edge-btn" style="display:none;">⏹️ Stop Adding Edges</button>
+    <div id="edge-click-status" class="mp-status"></div>
+</div>
+
+        <!-- ── CLEAR ── -->
+        <div class="mp-section">
+            <button class="btn btn-danger mp-btn" id="clear-graph-btn">🗑️ Clear Entire Graph</button>
+        </div>
+
+    </div>
+
+    <div class="manual-panel-footer">
+        <button class="btn btn-secondary mp-btn" id="manual-done-btn">✓ Done</button>
+    </div>
+</div>
+
+<script src="core.js"></script>
+<script src="visualizer.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
