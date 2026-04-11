@@ -5,23 +5,44 @@ class Graph {
         this.edges = [];
     }
 
-    addNode(id, x, y) {
-        this.nodes.push({ id, x, y });
-    }
+   addNode(id, x, y) {
+    this.nodes.push({ id: Number(id), x, y });
+}
 
-    addEdge(source, target, weight) {
+  addEdge(source, target, weight) {
+    source = Number(source);
+    target = Number(target);
+    weight = Number(weight);
+
+    
+    const existing = this.edges.find(
+        e => (e.source === source && e.target === target) ||
+             (e.source === target && e.target === source)
+    );
+
+    if (existing) {
+        existing.weight = weight; 
+    } else {
         this.edges.push({ source, target, weight });
     }
+}
 
-    getAdjacencyList() {
-        const adj = {};
-        this.nodes.forEach(node => (adj[node.id] = []));
-        this.edges.forEach(edge => {
-            adj[edge.source].push({ node: edge.target, weight: edge.weight });
-            adj[edge.target].push({ node: edge.source, weight: edge.weight });
-        });
-        return adj;
-    }
+   getAdjacencyList() {
+    const adj = {};
+    this.nodes.forEach(node => (adj[node.id] = []));
+
+    this.edges.forEach(edge => {
+        if (!adj[edge.source]) adj[edge.source] = [];
+        if (!adj[edge.target]) adj[edge.target] = [];
+
+        adj[edge.source].push({ node: edge.target, weight: edge.weight });
+        adj[edge.target].push({ node: edge.source, weight: edge.weight });
+    });
+
+    console.log("Adjacency:", adj); 
+
+    return adj;
+}
 
     clear() {
         this.nodes = [];
@@ -48,7 +69,8 @@ class Graph {
 
 // ==================== DIJKSTRA'S ALGORITHM ====================
 class DijkstraAlgorithm {
-    static findShortestPath(graph, source) {
+    static findShortestPath(graph, source) {  
+        
         const adj = graph.getAdjacencyList();
         const distances = {};
         const previous = {};
@@ -60,14 +82,15 @@ class DijkstraAlgorithm {
             previous[node.id] = null;
             unvisited.add(node.id);
         });
+
         distances[source] = 0;
 
-        // Main algorithm
+       
         while (unvisited.size > 0) {
             let current = null;
             let minDist = Infinity;
 
-            // Find unvisited node with minimum distance
+           
             unvisited.forEach(node => {
                 if (distances[node] < minDist) {
                     minDist = distances[node];
@@ -79,13 +102,13 @@ class DijkstraAlgorithm {
 
             unvisited.delete(current);
 
-            // Update distances to neighbors
-            adj[current].forEach(({ node: neighbor, weight }) => {
+            
+            adj[current]?.forEach(({ node: neighbor, weight }) => {
                 if (unvisited.has(neighbor)) {
                     const newDistance = distances[current] + weight;
                     if (newDistance < distances[neighbor]) {
                         distances[neighbor] = newDistance;
-                        previous[neighbor] = current;
+                        previous[neighbor] = current;  // ✅ KEY: Parent pointer for routing
                     }
                 }
             });
@@ -96,17 +119,18 @@ class DijkstraAlgorithm {
 
     static getPath(source, destination, previous) {
         const path = [];
-        let current = destination;
+        let current = Number(destination);
 
-        while (current !== null) {
+        // Reconstruct path backwards
+        while (current !== null && current !== undefined) {
             path.unshift(current);
             current = previous[current];
         }
 
-        return path.length > 0 && path[0] === source ? path : [];
+        // Validate path starts with source
+        return path.length > 0 && path[0] === Number(source) ? path : [];
     }
 }
-
 // ==================== ROUTING TABLE MANAGER ====================
 class RoutingTableManager {
     constructor(tableId) {
@@ -117,20 +141,36 @@ class RoutingTableManager {
     updateTable(distances, previous, sourceId) {
         if (!this.tbody) return;
 
+        sourceId = Number(sourceId); 
         this.tbody.innerHTML = '';
 
         Object.keys(distances).forEach(destId => {
-            if (destId !== sourceId.toString()) {
-                const row = this.tbody.insertRow();
-                const dist = distances[destId];
-                const prevNode = previous[destId];
+            const dest = Number(destId);
 
-                row.insertCell(0).textContent = `Node ${destId}`;
-                row.insertCell(1).textContent = prevNode !== null ? `Node ${prevNode}` : '-';
+            if (dest !== sourceId) {
+                const row = this.tbody.insertRow();
+                const dist = distances[dest];
+
+                const nextHop = this.getNextHop(dest, previous, sourceId);
+
+                row.insertCell(0).textContent = `Node ${dest}`;
+                row.insertCell(1).textContent = nextHop !== null ? `Node ${nextHop}` : '-';
                 row.insertCell(2).textContent = dist === Infinity ? '∞' : dist;
             }
         });
     }
+
+   getNextHop(destId, previous, sourceId) {
+    destId = Number(destId);
+    sourceId = Number(sourceId);
+    let current = destId;
+    
+    // Follow previous pointers until we reach a direct neighbor of source
+    while (previous[current] !== null && previous[current] !== sourceId) {
+        current = previous[current];
+    }
+    return (previous[current] === sourceId) ? current : null;
+}
 
     clear() {
         if (this.tbody) {
@@ -188,7 +228,10 @@ class WeightEditor {
                 confirmBtn.removeEventListener('click', handleConfirm);
                 cancelBtn.removeEventListener('click', handleCancel);
                 closeBtn.removeEventListener('click', handleCancel);
-                onConfirm();
+                // Recalculate after weight update
+onConfirm(); // keep this
+
+console.log("Updated Edges:", this.graph.edges);
             }
         };
 
@@ -223,12 +266,14 @@ class WeightEditor {
     }
 
     applyWeights() {
-        const inputs = this.container.querySelectorAll('.weight-input');
-        inputs.forEach(input => {
-            const index = parseInt(input.dataset.edgeIndex);
-            const newWeight = parseInt(input.value);
-            const edge = this.graph.edges[index];
-            this.graph.updateEdgeWeight(edge.source, edge.target, newWeight);
-        });
-    }
+    const inputs = this.container.querySelectorAll('.weight-input');
+
+    inputs.forEach(input => {
+        const index = parseInt(input.dataset.edgeIndex);
+        const newWeight = parseInt(input.value);
+        const edge = this.graph.edges[index];
+
+        this.graph.updateEdgeWeight(edge.source, edge.target, newWeight);
+    });
+}
 }
