@@ -330,13 +330,50 @@ class GraphVisualizer {
             const weight = parseInt(newWeight);
             if (weight > 0) {
                 this.graph.updateEdgeWeight(source, target, weight);
-                textElement.textContent = weight;
+textElement.textContent = weight;
+
+//Recalculate after weight change
+if (this.sourceNode !== null && this.destNode !== null) {
+    this.runDijkstra();
+}
             } else {
                 alert('Weight must be a positive number');
             }
         }
     }
+runDijkstra() {
+    if (!this.sourceNode || !this.destNode) return;
+    
+    const { distances, previous } = DijkstraAlgorithm.findShortestPath(
+        this.graph, this.sourceNode
+    );
 
+    const path = DijkstraAlgorithm.getPath(
+        this.sourceNode, this.destNode, previous
+    );
+
+    // Update result box
+    const resultBox = document.querySelector('.result-box');
+    if (resultBox) {
+        resultBox.innerHTML = `
+            Path: ${path.map(n => `Node ${n}`).join(' → ')}<br>
+            Distance: ${distances[this.destNode] || '∞'}
+        `;
+    }
+
+    
+    try {
+        if (window.routingTableManager && typeof window.routingTableManager.updateTable === 'function') {
+            window.routingTableManager.updateTable(distances, previous, this.sourceNode);
+        }
+    } catch (e) {
+        console.warn('Routing table update failed:', e);
+    }
+
+    this.highlightPath(this.sourceNode, this.destNode, previous);
+const destRow = document.querySelector('#routing-table tbody tr:nth-child(2)');
+if (destRow) destRow.classList.add('active-path');
+}
     onNodeClick(nodeId) {
         if (this.sourceNode === null) {
             this.sourceNode = nodeId;
@@ -468,3 +505,4 @@ class GraphVisualizer {
         this.redrawGraph();
     }
 }
+window.routingTableManager = new RoutingTableManager('routing-table'); 
