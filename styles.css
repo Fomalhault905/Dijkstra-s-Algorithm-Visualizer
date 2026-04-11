@@ -98,8 +98,6 @@ body {
     margin: 0 auto;
     height: 100%;
 }
-
-/* Edge styles (moved to proper location) */
 .edge {
     stroke: #94a3b8;
     stroke-width: 2;
@@ -110,7 +108,6 @@ body {
     stroke: red;
     stroke-width: 4;
 }
-
 /* Canvas area */
 .canvas-area {
     position: relative;
@@ -123,13 +120,10 @@ body {
 
 #graph-svg {
     width: 100%;
-    height: 600px;
+    height: 100%;
     display: block;
 }
 
-.canvas-area {
-    min-height: 600px;
-}
 .selection-info {
     position: absolute;
     bottom: 1rem;
@@ -341,12 +335,6 @@ body {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-
-    display: none; /* hidden by default */
-}
-
-.modal.show {
-    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -518,41 +506,26 @@ body {
 .node-id-label {
     pointer-events: none;
 }
-.node.selected circle {
-    stroke: #22c55e;
-    stroke-width: 4;
-    fill: #dcfce7;
-}
-
-.node.source circle {
-    stroke: #2563eb;
-    fill: #dbeafe;
-}
-
-.node.destination circle {
-    stroke: #ef4444;
-    fill: #fee2e2;
-}
 
 .edge {
     stroke: var(--edge-default);
     stroke-width: 2;
     fill: none;
-    transition: all 0.3s ease;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease;
 }
 
 .edge.active {
     stroke: var(--edge-active);
-    stroke-width: 4;
+    stroke-width: 3;
 }
 
 .edge-label {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 14px;
-    font-weight: 700;
-    fill: #1e31af;
+    font-size: 0.875rem;
+    font-weight: 600;
+    fill: var(--muted-foreground);
     text-anchor: middle;
-    cursor: pointer;
+    pointer-events: auto;
 }
 
 .edge-label:hover {
@@ -563,33 +536,6 @@ body {
 .packet {
     fill: var(--packet-color);
     filter: drop-shadow(0 0 4px var(--packet-color));
-}
-
-/* Edge Labels */
-#graph-svg text.edge-label {
-    font-size: 16px;
-    font-weight: 800;
-    fill: #1e31af;
-    cursor: pointer;
-    pointer-events: auto;
-    user-select: none;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-#graph-svg text.edge-label:hover {
-    font-size: 18px;
-    font-weight: 900;
-}
-
-#graph-svg .edge-label-bg {
-    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
-    cursor: pointer;
-    transition: stroke-width 0.2s ease;
-}
-
-#graph-svg .edge-label-bg:hover {
-    stroke-width: 2.5;
-    filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.4));
 }
 
 /* Responsive */
@@ -633,312 +579,62 @@ body {
     .modal-content {
         width: 95%;
     }
-}
 
-/* Tab Container (fixed syntax) */
-.tab-container {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 1rem;
-}
-
-.tab-btn {
-    flex: 1;
-    padding: 0.75rem;
-    background: none;
-    border: none;
+/* EDGE LABELS  */
+#graph-svg text.edge-label {
+    font-size: 16px;
+    font-weight: 800;
+    fill: #1e31af;
     cursor: pointer;
-    font-family: inherit;
-    font-weight: 500;
+    pointer-events: auto;
+    user-select: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#graph-svg text.edge-label:hover {
+    font-size: 18px;
+    font-weight: 900;
+}
+
+#graph-svg .edge-label-bg {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+    cursor: pointer;
+    transition: stroke-width 0.2s ease;
+}
+
+#graph-svg .edge-label-bg:hover {
+    stroke-width: 2.5;
+    filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.4));
+}
+#routing-table tbody tr {
     transition: all 0.2s ease;
 }
-
-.tab-btn.active {
-    border-bottom: 2px solid var(--primary);
-    color: var(--primary);
-}
-
-/* Manual Mode Modal Styles */
-.manual-modal-content {
-    max-width: 700px;
-    max-height: 90vh;
-}
-
-.manual-section {
-    margin-bottom: 1.5rem;
-}
-
-.manual-section h3 {
-    font-size: 1.125rem;
+#routing-table tbody tr:hover {
+    background: #f0f9ff;
+        }
+    /* Highlight best path in table */
+#routing-table tbody tr:nth-child(2) {  /* Dest row */
+    background: rgba(59, 130, 246, 0.1);
     font-weight: 600;
-    color: var(--foreground);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--primary);
 }
 
-.manual-option-card {
-    background: var(--secondary);
-    padding: 1.25rem;
-    border-radius: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.manual-option-card h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--foreground);
-    margin-bottom: 0.5rem;
-}
-
-.manual-option-card p {
-    font-size: 0.875rem;
-    color: var(--muted-foreground);
-    margin-bottom: 1rem;
-}
-
-.manual-option-divider {
-    text-align: center;
-    color: var(--muted-foreground);
-    font-weight: 600;
-    margin: 1rem 0;
-    position: relative;
-}
-
-.manual-option-divider::before,
-.manual-option-divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 45%;
-    height: 1px;
-    background: var(--border);
-}
-
-.manual-option-divider::before {
-    left: 0;
-}
-
-.manual-option-divider::after {
-    right: 0;
-}
-
-.section-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 2rem 0;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.status-message {
-    margin-top: 0.75rem;
-    padding: 0.75rem;
-    background: var(--muted);
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-    min-height: 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-danger {
-    background-color: #EF4444;
-    color: white;
-}
-
-.btn-danger:hover {
-    background-color: #DC2626;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    color: var(--muted-foreground);
-    cursor: pointer;
-    padding: 0;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    line-height: 1;
-}
-
-.node.manual-selecting circle,
-.node.manual-selecting .node-background {
-    stroke: #f59e0b !important;
-    stroke-width: 4 !important;
-    fill: #fef3c7 !important;
-}
-
-/* ── Manual Mode Floating Panel ────────────────────────────── */
-.manual-panel {
-    position: fixed;
-    top: 50%;
-    right: 1.5rem;
-    transform: translateY(-50%);
-    width: 280px;
-    max-height: 90vh;
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-    z-index: 500;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.manual-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.85rem 1rem;
-    background: var(--primary);
-    color: #fff;
+/* Hover effect */
+#routing-table tbody tr:hover {
+    background: #eff6ff;
+    transform: scale(1.01);
+}/* Add to end of styles.css - PERFECTS the routing table */
+#routing-table tbody tr.active-path {
+    background: linear-gradient(90deg, #dbeafe, #eff6ff);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
     font-weight: 700;
-    font-size: 0.95rem;
-    border-radius: 0.6rem 0.6rem 0 0;
-    flex-shrink: 0;
 }
 
-.manual-panel-header .modal-close {
-    color: #fff;
-    font-size: 1.4rem;
-    opacity: 0.85;
-}
-.manual-panel-header .modal-close:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.15);
-    border-radius: 0.25rem;
+/* Animate table updates */
+#routing-table tbody tr {
+    animation: slideIn 0.3s ease forwards;
 }
 
-.manual-panel-body {
-    padding: 0.85rem 1rem;
-    overflow-y: auto;
-    flex: 1;
-}
-
-.manual-panel-footer {
-    padding: 0.75rem 1rem;
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-}
-
-.mp-section {
-    margin-bottom: 0.5rem;
-}
-
-.mp-section-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--muted-foreground);
-    margin-bottom: 0.5rem;
-}
-
-.mp-btn {
-    width: 100%;
-    padding: 0.55rem 0.75rem;
-    font-size: 0.82rem;
-    margin-bottom: 0.4rem;
-}
-
-/* Active / "in progress" button style */
-.btn-active {
-    background: #f59e0b;
-    color: #fff;
-    border: none;
-}
-.btn-active:hover {
-    background: #d97706;
-}
-
-.mp-status {
-    font-size: 0.78rem;
-    color: var(--primary);
-    font-weight: 600;
-    min-height: 1.2rem;
-    margin-bottom: 0.4rem;
-    padding: 0 0.1rem;
-}
-
-.mp-divider {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--muted-foreground);
-    margin: 0.5rem 0;
-    position: relative;
-}
-.mp-divider::before,
-.mp-divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 35%;
-    height: 1px;
-    background: var(--border);
-}
-.mp-divider::before { left: 0; }
-.mp-divider::after  { right: 0; }
-
-.mp-coords-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-bottom: 0.4rem;
-}
-
-.mp-input {
-    flex: 1;
-    padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 0.4rem;
-    background: var(--input);
-    font-size: 0.82rem;
-    color: var(--foreground);
-    min-width: 0;
-}
-.mp-input:focus {
-    outline: none;
-    border-color: var(--ring);
-}
-
-.mp-btn-small {
-    padding: 0.4rem 0.65rem;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    width: auto;
-}
-
-.mp-select {
-    width: 100%;
-    padding: 0.4rem 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 0.4rem;
-    background: var(--input);
-    font-size: 0.82rem;
-    color: var(--foreground);
-}
-.mp-select:focus {
-    outline: none;
-    border-color: var(--ring);
-}
-
-.mp-hr {
-    height: 1px;
-    background: var(--border);
-    margin: 0.75rem 0;
-}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}}
